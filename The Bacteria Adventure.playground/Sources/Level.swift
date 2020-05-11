@@ -52,6 +52,21 @@ public class Level: SKScene, SKPhysicsContactDelegate {
                 }
             }
         }
+        
+        /// Plasmids
+        for sprite in self.children {
+            if sprite.name == "plasmid" {
+                spin(sprite)
+            }
+        }
+        
+        /// Cell
+        for sprite in self.children {
+            if sprite.name == "cell" {
+                bounce(sprite)
+            }
+        }
+        
     }
     
     override public func update(_ currentTime: TimeInterval) {
@@ -169,6 +184,22 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         let distance = sqrt((xDist * xDist) + (yDist * yDist));
         let duration : TimeInterval = TimeInterval(distance/speed)
         return duration
+    }
+    
+    private func spin(_ node: SKNode) {
+        guard let spriteNode = node as? SKSpriteNode else { return }
+        let spin = SKAction.rotate(byAngle: CGFloat(3.14), duration: 4.0)
+        spriteNode.run(SKAction.repeatForever(spin))
+    }
+    
+    private func bounce(_ node: SKNode) {
+        
+        guard let spriteNode = node as? SKSpriteNode else { return }
+        let bounce = SKAction.sequence([
+            SKAction.moveBy(x: 0, y: 10, duration: 0.45),
+            SKAction.moveBy(x: 0, y: -10, duration: 0.45)
+        ])
+        spriteNode.run(SKAction.repeatForever(bounce))
     }
     
     // MARK: - Power-Up's
