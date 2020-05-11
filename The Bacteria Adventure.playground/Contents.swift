@@ -4,7 +4,7 @@ import SpriteKit
 
 let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 600, height: 450))
 
-if let scene = FirstLevel(fileNamed: "Level-1") {
+if let scene = BacteriumInstruction(fileNamed: "Instruction-Bacterium") {
     scene.scaleMode = .aspectFit
     sceneView.presentScene(scene)
 }

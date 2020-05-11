@@ -6,15 +6,17 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     // MARK: - Private Constants
     private let BACTERIA_SPEED: CGFloat = 155.0
     private let VIRUS_SPEED: CGFloat = 40.0
+    private let VIRUS_AWAKE_RANGE: Float = 180.0
     private let BACTERIA: Int = 1
     private let VIRUS: Int = 2
     private let CELL: Int = 3
     private let PLASMID: Int = 4
-
+    
     
     // MARK: -  Outlets
     var bacteria: SKSpriteNode?
     var viruses: [SKSpriteNode] = []
+    var virusAweakning: [Bool] = []
     
     
     // MARK: - Variables
@@ -29,7 +31,9 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     var imuneTimer: Timer?
     
     var level: Int { return 0 }
-    
+    var nextScene: SKScene? { return nil }
+    var repeatCurrentScene: SKScene? { return nil }
+
     // MARK: - Lifecycle
     override public func didMove(to view: SKView) {
         
@@ -49,6 +53,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             if sprite.name == "virus" {
                 if let sprite = sprite as? SKSpriteNode {
                     viruses.append(sprite)
+                    virusAweakning.append(false)
                 }
             }
         }
@@ -67,10 +72,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             }
         }
         
-    }
-    
-    override public func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
     }
     
     
@@ -116,7 +117,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         // print("Update count: \(updateCount)")
         
         guard let bacteria = bacteria, let touch = lastTouch else { return }
-                
+        
         let currentPosition = bacteria.position
         
         if shouldMove(currentPosition: currentPosition, touchPosition: touch) {
@@ -133,7 +134,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     private func stopBacteriaIfNeeded() {
         
         guard let bacteria = bacteria, let touch = lastTouch else { return }
-
+        
         if !shouldMove(currentPosition: bacteria.position, touchPosition: touch) {
             
             bacteria.physicsBody?.isResting = true
@@ -141,22 +142,40 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateViruses() {
+        
         guard let bacteria = bacteria else { return }
         let targetPosition = bacteria.position
         
-        for virus in viruses {
-            updatePosition(for: virus, to: targetPosition, speed: VIRUS_SPEED)
+        
+        
+        for (index, virus) in viruses.enumerated() {
+            
+            if virusAweakning[index] {
+                updatePosition(for: virus, to: targetPosition, speed: VIRUS_SPEED)
+            }
+                
+            else {
+                if viruShouldMove(virus) { virusAweakning[index] = true }
+            }
         }
     }
     
     private func shouldMove(currentPosition: CGPoint, touchPosition: CGPoint) -> Bool {
-                
+        
         guard let bacteria = bacteria else { return false } /// In case bacteria does not exist yet
         
         let isOnHorizontalRange = abs(currentPosition.x - touchPosition.x) > bacteria.frame.width / 2
         let isOnVerticalRange = abs(currentPosition.y - touchPosition.y) > bacteria.frame.height / 2
         
         return isOnHorizontalRange || isOnVerticalRange
+    }
+    
+    private func viruShouldMove(_ virus: SKNode) -> Bool {
+        
+        guard let bacteria = bacteria else { return false }
+        
+        return distance(from: virus, to: bacteria) <= VIRUS_AWAKE_RANGE
+        
     }
     
     fileprivate func updatePosition(for sprite: SKSpriteNode, to target: CGPoint, speed: CGFloat) {
@@ -178,14 +197,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         })
     }
     
-    func getDuration(from pointA: CGPoint, to pointB: CGPoint, speed:CGFloat = 100)-> TimeInterval {
-        let xDist = (pointB.x - pointA.x)
-        let yDist = (pointB.y - pointA.y)
-        let distance = sqrt((xDist * xDist) + (yDist * yDist));
-        let duration : TimeInterval = TimeInterval(distance/speed)
-        return duration
-    }
-    
     private func spin(_ node: SKNode) {
         guard let spriteNode = node as? SKSpriteNode else { return }
         let spin = SKAction.rotate(byAngle: CGFloat(3.14), duration: 4.0)
@@ -202,11 +213,23 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         spriteNode.run(SKAction.repeatForever(bounce))
     }
     
+    private func floatDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
+        return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+    }
+    
+    private func floatDistance(from: CGPoint, to: CGPoint) -> CGFloat {
+        return sqrt(floatDistanceSquared(from: from, to: to))
+    }
+    
+    private func distance(from nodeA: SKNode, to nodeB: SKNode) -> Float {
+        return Float(floatDistance(from: nodeA.position, to: nodeB.position))
+    }
+    
     // MARK: - Power-Up's
     func grantImunity() {
         
         guard let bacteria = bacteria else { return }
-
+        
         if let imuneTimer = imuneTimer {
             imuneTimer.invalidate()
             self.imuneTimer = nil
@@ -214,39 +237,39 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             print("did cancel color change")
             bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
         }
-
+        
         isBacteriaImune = true
         print("Power-up did start")
-
-
-       //  let colorChangeAction = SKAction.sequence([
-       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Orange")),
-       //      SKAction.wait(forDuration: 0.15),
-       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Green")),
-       //      SKAction.wait(forDuration: 0.15),
-       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")),
-       //      SKAction.wait(forDuration: 0.15),
-       //  ])
         
-       // let imuneAction = SKAction.repeatForever(colorChangeAction)
+        
+        //  let colorChangeAction = SKAction.sequence([
+        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Orange")),
+        //      SKAction.wait(forDuration: 0.15),
+        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Green")),
+        //      SKAction.wait(forDuration: 0.15),
+        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")),
+        //      SKAction.wait(forDuration: 0.15),
+        //  ])
+        
+        // let imuneAction = SKAction.repeatForever(colorChangeAction)
         
         let imuneAction = SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp"))
-
+        
         imuneTimer = Timer.scheduledTimer(withTimeInterval: 8.0, repeats: false) {
             timer in
-
+            
             self.isBacteriaImune = false
             print("Power-up did end")
-
+            
             bacteria.removeAction(forKey: "imune")
             bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
         }
-
+        
         bacteria.run(imuneAction, withKey: "imune")
         print("did start color change")
-
-    }
         
+    }
+    
     
     // MARK: - Physics
     override public func didSimulatePhysics() {
@@ -287,7 +310,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             print("Bacteria Touched Plasmid")
             if let node = bodyA.node { if node.name  == "plasmid" { node.removeFromParent() } }
             if let node = bodyB.node { if node.name  == "plasmid" { node.removeFromParent() } }
-
+            
             grantImunity()
         }
         
@@ -306,16 +329,27 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         if bodies.contains(b) { bodies.remove(at: bodies.firstIndex(of: b) ?? 0) }
         
         return bodies.isEmpty
-
+        
     }
     
     // MARK: - Navigation
     private func endGame(didWin: Bool) {
-        let resultScene = LevelEnd(size: size, didWin: didWin, nextLevel: level + 1)
-        let transition = SKTransition.flipVertical(withDuration: 1.0)
-        view?.presentScene(resultScene, transition: transition)
+        
+        if didWin {
+            
+            guard let nextScene = nextScene else { return }
+            let transition = SKTransition.flipVertical(withDuration: 1.0)
+            nextScene.scaleMode = .aspectFit
+            view?.presentScene(nextScene, transition: transition)
+        }
+        
+        else {
+            
+            guard let repeatCurrentScene = repeatCurrentScene else { return }
+            let transition = SKTransition.flipVertical(withDuration: 1.0)
+            repeatCurrentScene.scaleMode = .aspectFit
+            view?.presentScene(repeatCurrentScene, transition: transition)
+        }
+        
     }
-
-    
-    
 }

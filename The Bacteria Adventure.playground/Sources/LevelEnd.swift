@@ -66,9 +66,9 @@ public class LevelEnd: SKScene {
         
         switch level {
         case 1: nextScene = FirstLevel(fileNamed: "Level-1")
-        case 2: nextScene = FirstLevel(fileNamed: "Level-1")
-        case 3: nextScene = FirstLevel(fileNamed: "Level-1")
-        default: nextScene = GameEnd(fileNamed: "GameEnd")
+        case 2: nextScene = SecondLevel(fileNamed: "Level-2")
+        case 3: nextScene = ThirdLevel(fileNamed: "Level-3")
+        default: nextScene = GameEnd(fileNamed: "Instruction-GameEnd")
         }
 
         guard let scene = nextScene else { fatalError("Scene for level \(level) not found") }
