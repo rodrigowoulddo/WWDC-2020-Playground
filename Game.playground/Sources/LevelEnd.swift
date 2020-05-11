@@ -45,7 +45,7 @@ public class LevelEnd: SKScene {
         /// Big icon
         let pageIcon = SKSpriteNode(imageNamed: didWin ? "Asset-Cell" : "Asset-Virus")
         pageIcon.position = CGPoint(x: frame.midX, y: frame.midY)
-        pageIcon.setScale(0.6)
+        pageIcon.setScale(0.25)
         let bounceAction = SKAction.sequence([ SKAction.moveBy(x: 0, y: 10, duration: 0.2), SKAction.moveBy(x: 0, y: -10, duration: 0.2)])
         pageIcon.run(SKAction.repeatForever(bounceAction))
         addChild(pageIcon)
@@ -65,9 +65,9 @@ public class LevelEnd: SKScene {
         var nextScene: SKScene?
         
         switch level {
-        case 1: nextScene = FirstLevel(fileNamed: "Lavel-1")
-        case 2: nextScene = FirstLevel(fileNamed: "Lavel-1")
-        case 3: nextScene = FirstLevel(fileNamed: "Lavel-1")
+        case 1: nextScene = FirstLevel(fileNamed: "Level-1")
+        case 2: nextScene = FirstLevel(fileNamed: "Level-1")
+        case 3: nextScene = FirstLevel(fileNamed: "Level-1")
         default: nextScene = GameEnd(fileNamed: "GameEnd")
         }
 

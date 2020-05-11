@@ -23,6 +23,11 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     var touchTimer: Timer?
     var canHandleMove: Bool = true
     var didStartMovement: Bool = false
+    
+    /// Imune Variables
+    var isBacteriaImune: Bool = false
+    var imuneTimer: Timer?
+    
     var level: Int { return 0 }
     
     // MARK: - Lifecycle
@@ -110,6 +115,16 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    private func stopBacteriaIfNeeded() {
+        
+        guard let bacteria = bacteria, let touch = lastTouch else { return }
+
+        if !shouldMove(currentPosition: bacteria.position, touchPosition: touch) {
+            
+            bacteria.physicsBody?.isResting = true
+        }
+    }
+    
     func updateViruses() {
         guard let bacteria = bacteria else { return }
         let targetPosition = bacteria.position
@@ -139,9 +154,12 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         sprite.run(rotateAction, completion: {
             
             /// And when it finishes rotating, it starts moving
-            let movement = SKAction.move(to: target, duration: self.getDuration(from: sprite.position, to: target, speed: speed))
+            let velocityX = speed * cos(angle)
+            let velocityY = speed * sin(angle)
+            
+            let newVelocity = CGVector(dx: velocityX, dy: velocityY)
             sprite.removeAllActions() /// In case there was a previously programmed movement, it is canceled
-            sprite.run(movement)
+            sprite.physicsBody?.velocity = newVelocity
         })
     }
     
@@ -153,11 +171,57 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         return duration
     }
     
+    // MARK: - Power-Up's
+    func grantImunity() {
+        
+        guard let bacteria = bacteria else { return }
+
+        if let imuneTimer = imuneTimer {
+            imuneTimer.invalidate()
+            self.imuneTimer = nil
+            bacteria.removeAction(forKey: "imune")
+            print("did cancel color change")
+            bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
+        }
+
+        isBacteriaImune = true
+        print("Power-up did start")
+
+
+       //  let colorChangeAction = SKAction.sequence([
+       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Orange")),
+       //      SKAction.wait(forDuration: 0.15),
+       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Green")),
+       //      SKAction.wait(forDuration: 0.15),
+       //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")),
+       //      SKAction.wait(forDuration: 0.15),
+       //  ])
+        
+       // let imuneAction = SKAction.repeatForever(colorChangeAction)
+        
+        let imuneAction = SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp"))
+
+        imuneTimer = Timer.scheduledTimer(withTimeInterval: 8.0, repeats: false) {
+            timer in
+
+            self.isBacteriaImune = false
+            print("Power-up did end")
+
+            bacteria.removeAction(forKey: "imune")
+            bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
+        }
+
+        bacteria.run(imuneAction, withKey: "imune")
+        print("did start color change")
+
+    }
+        
     
     // MARK: - Physics
     override public func didSimulatePhysics() {
         if !viruses.isEmpty && didStartMovement {
             updateViruses()
+            updateBacteria()
         }
     }
     
@@ -168,29 +232,38 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
         
-        handleContact(betwwen: firstBody.categoryBitMask, and: secondBody.categoryBitMask)
+        handleContact(betwwen: firstBody, and: secondBody)
         
     }
     
-    private func handleContact(betwwen bodyA: UInt32, and bodyB: UInt32) {
+    private func handleContact(betwwen bodyA: SKPhysicsBody, and bodyB: SKPhysicsBody) {
+        
+        let a = Int(bodyA.categoryBitMask)
+        let b = Int(bodyB.categoryBitMask)
         
         /// In case the contact does not include the Bacteria
-        if bodyA != BACTERIA && bodyB != BACTERIA { return }
-        
-        let a = Int(bodyA)
-        let b = Int(bodyB)
+        if a != BACTERIA && b != BACTERIA { return }
         
         if contactBetween(a, b, is: [BACTERIA, VIRUS]) {
+            
             print("Virus Touched Bacteria")
+            if isBacteriaImune { return }
             endGame(didWin: false)
         }
         
         if contactBetween(a, b, is: [BACTERIA, PLASMID]) {
-            print("Virus Touched Plasmid")
+            
+            print("Bacteria Touched Plasmid")
+            if let node = bodyA.node { if node.name  == "plasmid" { node.removeFromParent() } }
+            if let node = bodyB.node { if node.name  == "plasmid" { node.removeFromParent() } }
+
+            grantImunity()
         }
         
         if contactBetween(a, b, is: [BACTERIA, CELL]) {
-            print("Virus Touched Cell")
+            
+            print("Bacteria Touched Cell")
+            endGame(didWin: true)
         }
         
     }
