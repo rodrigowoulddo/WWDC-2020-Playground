@@ -1,15 +1,9 @@
 
-import PlaygroundSupport
-import SpriteKit
-
-let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 600, height: 450))
-
-if let scene = BacteriumInstruction(fileNamed: "Instruction-Bacterium") {
-    scene.scaleMode = .aspectFit
-    sceneView.presentScene(scene)
-}
-else {
-    print("Failed to initiate SKScene")
-}
-
-PlaygroundSupport.PlaygroundPage.current.liveView = sceneView
+/*:
+ 
+ # The Bacteria Adventure
+ 
+This is a maze based game about microbiology. For a smoother experience, turn off the **"Enable Results"** option on the playground app and make it full screen. Enjoy!
+ 
+ */
+Game.play()

@@ -15,12 +15,12 @@ public class Instruction: SKScene {
     func buildView() { }
     
     // MARK: - Movement
-    func bounceVertically(_ node: SKNode) {
+    func bounceVertically(_ node: SKNode, duration: Double = 0.45) {
         
         guard let spriteNode = node as? SKSpriteNode else { return }
         let bounce = SKAction.sequence([
-            SKAction.moveBy(x: 0, y: 18, duration: 0.45),
-            SKAction.moveBy(x: 0, y: -18, duration: 0.45)
+            SKAction.moveBy(x: 0, y: 18, duration: duration),
+            SKAction.moveBy(x: 0, y: -18, duration: duration)
         ])
         spriteNode.run(SKAction.repeatForever(bounce))
     }
@@ -83,6 +83,15 @@ public class Instruction: SKScene {
         node.run(SKAction.repeatForever(spin))
     }
     
+    func configureText(_ node: SKLabelNode, text: String) {
+        
+        node.text = text
+        node.lineBreakMode = NSLineBreakMode.byWordWrapping
+        node.numberOfLines = 0
+        node.preferredMaxLayoutWidth = 580
+        
+    }
+    
     // MARK: - Touches
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
@@ -96,6 +105,21 @@ public class Instruction: SKScene {
         let transition = SKTransition.flipVertical(withDuration: 1.0)
         scene.scaleMode = .aspectFit
         view?.presentScene(scene, transition: transition)
+    }
+}
+
+
+public class CoverInstruction: Instruction {
+    
+    // MARK: - Variables
+    override var nextScene: SKScene? { return BacteriumInstruction(fileNamed: "Instruction-Bacterium") }
+    
+    // MARK: - Configuration
+    override func buildView() {
+        
+        guard let bacteria = childNode(withName: "bacteria") as? SKSpriteNode else { return }
+        
+        bounceVertically(bacteria, duration: 0.70) /// Makes the bounce smoothier
     }
 }
 
@@ -177,7 +201,7 @@ public class PlasmidInstruction: Instruction {
 public class GameEnd: Instruction {
     
     // MARK: - Variables
-    override var nextScene: SKScene? { nil } // Change to About me
+    override var nextScene: SKScene? { AboutMeInstruction(fileNamed: "Instruction-About-Me") } // 
 
     // MARK: - Configuration
     override func buildView() {
@@ -190,3 +214,33 @@ public class GameEnd: Instruction {
     }
     
 }
+
+public class AboutMeInstruction: Instruction {
+    
+    // MARK: - Variables
+    override var nextScene: SKScene? { return nil }
+    
+    // MARK: - Configuration
+    override func buildView() {
+        
+        guard let me = childNode(withName: "me") as? SKSpriteNode else { return }
+        guard let firstParagraph = childNode(withName: "first_paragraph") as? SKLabelNode else { return }
+        guard let secondParagraph = childNode(withName: "second_paragraph") as? SKLabelNode else { return }
+
+        bounceVertically(me, duration: 0.70) /// Makes the bounce smoothier
+        
+        configureText(firstParagraph, text:
+        """
+        Hi! I’m Rodrigo and I love coding as much as I love biology. That’s why I am an undergraduate student in Biomedical Informatics at UFCSPA in Brazil. I've been a student at the Apple Developer’s Academy in Porto Alegre for the past year and, since then, I am getting to know the swift language (which is awesome, by the way) and started building some nice apps, just like this playground you are seeing.
+        """
+        )
+        
+        configureText(secondParagraph, text:
+        """
+        Hopefully, you got the idea that bacterias are not always bad to us, and they actually play an important role in our systems! I hope you liked the game as much as my little brother did.
+        """
+        )
+        
+    }
+}
+

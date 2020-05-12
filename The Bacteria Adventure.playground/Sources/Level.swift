@@ -71,7 +71,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
                 bounce(sprite)
             }
         }
-        
     }
     
     
@@ -91,9 +90,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             }
             
             updateBacteria()
-            
         }
-        
     }
     
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -111,10 +108,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     
     // MARK: - Movements
     private func updateBacteria() {
-        
-        /// To watch performance
-        // updateCount += 1
-        // print("Update count: \(updateCount)")
         
         guard let bacteria = bacteria, let touch = lastTouch else { return }
         
@@ -267,7 +260,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         
         bacteria.run(imuneAction, withKey: "imune")
         print("did start color change")
-        
     }
     
     
@@ -287,7 +279,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         let secondBody: SKPhysicsBody = contact.bodyB
         
         handleContact(betwwen: firstBody, and: secondBody)
-        
     }
     
     private func handleContact(betwwen bodyA: SKPhysicsBody, and bodyB: SKPhysicsBody) {
@@ -319,7 +310,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             print("Bacteria Touched Cell")
             endGame(didWin: true)
         }
-        
     }
     
     private func contactBetween(_ a: Int, _ b: Int, is contactBodies: [Int]) -> Bool {
@@ -329,7 +319,6 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         if bodies.contains(b) { bodies.remove(at: bodies.firstIndex(of: b) ?? 0) }
         
         return bodies.isEmpty
-        
     }
     
     // MARK: - Navigation
@@ -350,6 +339,24 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             repeatCurrentScene.scaleMode = .aspectFit
             view?.presentScene(repeatCurrentScene, transition: transition)
         }
-        
     }
+}
+
+
+public class FirstLevel: Level {
+    override var level: Int { return 1 }
+    override var nextScene: SKScene? { return  PlasmidInstruction(fileNamed: "Instruction-Plasmid") }
+    override var repeatCurrentScene: SKScene? { return  LevelEnd(size: size, didWin: false, nextLevel: level + 1) }
+}
+
+public class SecondLevel: Level {
+    override var level: Int { return 2 }
+    override var nextScene: SKScene? { return  LevelEnd(size: size, didWin: true, nextLevel: level + 1) }
+    override var repeatCurrentScene: SKScene? { return  LevelEnd(size: size, didWin: false, nextLevel: level + 1) }
+}
+
+public class ThirdLevel: Level {
+    override var level: Int { return 3 }
+    override var nextScene: SKScene? { return  GameEnd(fileNamed: "Instruction-GameEnd")}
+    override var repeatCurrentScene: SKScene? { return  LevelEnd(size: size, didWin: false, nextLevel: level + 1) }
 }
