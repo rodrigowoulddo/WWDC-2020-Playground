@@ -32,6 +32,8 @@ public class LevelEnd: SKScene {
         background.position = CGPoint(x: -620, y: -655)
         background.anchorPoint = CGPoint(x: 0, y: 0)
         addChild(background)
+        bounceHorizontally(background, distance: 1000, duration: 15)
+
 
         
         /// Main message text
@@ -44,7 +46,7 @@ public class LevelEnd: SKScene {
         
         /// Action tap button
         let tapButton = SKSpriteNode(texture: SKTexture(imageNamed: didWin ? "Asset-Tap-next-level" : "Asset-Tap-try-again"))
-        tapButton.size = CGSize(width: didWin ? 445 : 283, height: 90)
+        tapButton.size = CGSize(width: didWin ? 460 : 283, height: 90)
         tapButton.position = CGPoint(x: frame.midX, y: frame.midY - 310)
         addChild(tapButton)
         
@@ -58,6 +60,16 @@ public class LevelEnd: SKScene {
         
     }
     
+    func bounceHorizontally(_ node: SKNode, distance: CGFloat = 15, duration: Double = 0.30 ) {
+        
+        guard let spriteNode = node as? SKSpriteNode else { return }
+        let bounce = SKAction.sequence([
+            SKAction.moveBy(x: -1 * distance, y: 0, duration: duration),
+            SKAction.moveBy(x: distance, y: 0, duration: duration)
+        ])
+        spriteNode.run(SKAction.repeatForever(bounce))
+    }
+    
     
     // MARK: - Touches
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -67,12 +79,12 @@ public class LevelEnd: SKScene {
     
     // MARK: - Navigation
     private func sendToLevel(_ level: Int) {
-        
+            
         var nextScene: SKScene?
         
         switch level {
         case 1: nextScene = FirstLevel(fileNamed: "Level-1")
-        case 2: nextScene = PlasmidInstruction(fileNamed: "Instruction-Plasmid")
+        case 2: nextScene = didWin ? PlasmidInstruction(fileNamed: "Instruction-Plasmid") : SecondLevel(fileNamed: "Level-2")
         case 3: nextScene = ThirdLevel(fileNamed: "Level-3")
         default: nextScene = GameEnd(fileNamed: "Instruction-GameEnd")
         }

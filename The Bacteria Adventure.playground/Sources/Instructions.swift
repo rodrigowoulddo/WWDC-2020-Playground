@@ -9,10 +9,17 @@ public class Instruction: SKScene {
     // MARK: - LifeCycle
     override public func didMove(to view: SKView) {
         buildView()
+        animateBackground()
     }
     
     // MARK: - Configuration
     func buildView() { }
+    
+    private func animateBackground() {
+       
+        guard let background = childNode(withName: "background") as? SKSpriteNode else { return }
+        bounceHorizontally(background, distance: 1000, duration: 15)
+    }
     
     // MARK: - Movement
     func bounceVertically(_ node: SKNode, duration: Double = 0.45) {
@@ -116,10 +123,7 @@ public class CoverInstruction: Instruction {
     
     // MARK: - Configuration
     override func buildView() {
-        
-        guard let background = childNode(withName: "background") as? SKSpriteNode else { return }
-        
-        bounceHorizontally(background, distance: 1000, duration: 9)
+
     }
 }
 

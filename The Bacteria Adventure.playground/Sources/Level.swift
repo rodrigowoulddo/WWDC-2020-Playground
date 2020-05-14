@@ -25,6 +25,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     var touchTimer: Timer?
     var canHandleMove: Bool = true
     var didStartMovement: Bool = false
+    var levelDidEnd: Bool = false
     
     /// Imune Variables
     var isBacteriaImune: Bool = false
@@ -227,24 +228,10 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             imuneTimer.invalidate()
             self.imuneTimer = nil
             bacteria.removeAction(forKey: "imune")
-            print("did cancel color change")
             bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
         }
         
         isBacteriaImune = true
-        print("Power-up did start")
-        
-        
-        //  let colorChangeAction = SKAction.sequence([
-        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Orange")),
-        //      SKAction.wait(forDuration: 0.15),
-        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp-Green")),
-        //      SKAction.wait(forDuration: 0.15),
-        //      SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")),
-        //      SKAction.wait(forDuration: 0.15),
-        //  ])
-        
-        // let imuneAction = SKAction.repeatForever(colorChangeAction)
         
         let imuneAction = SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria-PowerUp"))
         
@@ -252,14 +239,12 @@ public class Level: SKScene, SKPhysicsContactDelegate {
             timer in
             
             self.isBacteriaImune = false
-            print("Power-up did end")
             
             bacteria.removeAction(forKey: "imune")
             bacteria.run(SKAction.setTexture(SKTexture(imageNamed: "Asset-Bacteria")))
         }
         
         bacteria.run(imuneAction, withKey: "imune")
-        print("did start color change")
     }
     
     
@@ -274,6 +259,8 @@ public class Level: SKScene, SKPhysicsContactDelegate {
     
     // MARK: - Contact
     public func didBegin(_ contact: SKPhysicsContact) {
+        
+        if levelDidEnd { return }
         
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
@@ -290,15 +277,14 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         if a != BACTERIA && b != BACTERIA { return }
         
         if contactBetween(a, b, is: [BACTERIA, VIRUS]) {
-            
-            print("Virus Touched Bacteria")
+                         
             if isBacteriaImune { return }
+            levelDidEnd = true
             endGame(didWin: false)
         }
         
         if contactBetween(a, b, is: [BACTERIA, PLASMID]) {
             
-            print("Bacteria Touched Plasmid")
             if let node = bodyA.node { if node.name  == "plasmid" { node.removeFromParent() } }
             if let node = bodyB.node { if node.name  == "plasmid" { node.removeFromParent() } }
             
@@ -307,7 +293,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
         
         if contactBetween(a, b, is: [BACTERIA, CELL]) {
             
-            print("Bacteria Touched Cell")
+            levelDidEnd = true
             endGame(didWin: true)
         }
     }

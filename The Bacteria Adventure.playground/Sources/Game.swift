@@ -8,7 +8,7 @@ public class Game {
     public static func play() {
         
         let sceneView = SKView(frame: CGRect(x:0 , y:0, width: 600, height: 450))
-
+        
         guard let scene = CoverInstruction(fileNamed: "Instruction-Cover") else { return }
         playMusic(on: scene)
 
