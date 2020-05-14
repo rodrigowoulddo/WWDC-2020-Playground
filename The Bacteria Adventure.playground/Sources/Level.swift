@@ -345,7 +345,7 @@ public class Level: SKScene, SKPhysicsContactDelegate {
 
 public class FirstLevel: Level {
     override var level: Int { return 1 }
-    override var nextScene: SKScene? { return  PlasmidInstruction(fileNamed: "Instruction-Plasmid") }
+    override var nextScene: SKScene? { return  LevelEnd(size: size, didWin: true, nextLevel: level + 1) }
     override var repeatCurrentScene: SKScene? { return  LevelEnd(size: size, didWin: false, nextLevel: level + 1) }
 }
 

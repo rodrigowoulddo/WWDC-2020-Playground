@@ -66,7 +66,7 @@ public class LevelEnd: SKScene {
         
         switch level {
         case 1: nextScene = FirstLevel(fileNamed: "Level-1")
-        case 2: nextScene = SecondLevel(fileNamed: "Level-2")
+        case 2: nextScene = PlasmidInstruction(fileNamed: "Instruction-Plasmid")
         case 3: nextScene = ThirdLevel(fileNamed: "Level-3")
         default: nextScene = GameEnd(fileNamed: "Instruction-GameEnd")
         }
