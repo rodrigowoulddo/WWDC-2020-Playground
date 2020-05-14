@@ -26,21 +26,27 @@ public class LevelEnd: SKScene {
     // MARK: - Configuration
     private func buildView() {
         
+        /// Background
+        let background = SKSpriteNode(texture: SKTexture(imageNamed: "Asset-Background"))
+        background.size = CGSize(width: 2630, height: 1595)
+        background.position = CGPoint(x: -620, y: -655)
+        background.anchorPoint = CGPoint(x: 0, y: 0)
+        addChild(background)
+
+        
         /// Main message text
         let winLabel = SKLabelNode(text: didWin ? "You survived!" : "You got infected!")
         winLabel.fontName = "AvenirNext-Bold"
-        winLabel.fontSize = 45
+        winLabel.fontSize = 68
         winLabel.fontColor = .white
-        winLabel.position = CGPoint(x: frame.midX, y: frame.midY*1.5)
+        winLabel.position = CGPoint(x: frame.midX, y: frame.midY + 275)
         addChild(winLabel)
         
-        /// Action text
-        let label = SKLabelNode(text: didWin ? "Tap to play the next level" : "Tap to try again")
-        label.fontName = "AvenirNext-Bold"
-        label.fontSize = 30
-        label.fontColor = .white
-        label.position = CGPoint(x: frame.midX, y: frame.midY*0.5)
-        addChild(label)
+        /// Action tap button
+        let tapButton = SKSpriteNode(texture: SKTexture(imageNamed: didWin ? "Asset-Tap-next-level" : "Asset-Tap-try-again"))
+        tapButton.size = CGSize(width: didWin ? 445 : 283, height: 90)
+        tapButton.position = CGPoint(x: frame.midX, y: frame.midY - 310)
+        addChild(tapButton)
         
         /// Big icon
         let pageIcon = SKSpriteNode(imageNamed: didWin ? "Asset-Cell" : "Asset-Virus")

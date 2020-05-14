@@ -29,12 +29,12 @@ public class Instruction: SKScene {
         case left
         case right
     }
-    func bounceHorizontally(_ node: SKNode, option: HorizontalBounceOption = .left ) {
+    func bounceHorizontally(_ node: SKNode, option: HorizontalBounceOption = .left, distance: CGFloat = 15, duration: Double = 0.30 ) {
         
         guard let spriteNode = node as? SKSpriteNode else { return }
         let bounce = SKAction.sequence([
-            SKAction.moveBy(x: option == .left ? -15 : 15, y: 0, duration: 0.30),
-            SKAction.moveBy(x: option == .left ? 15 : -15, y: 0, duration: 0.30)
+            SKAction.moveBy(x: option == .left ? -1 * distance : distance, y: 0, duration: duration),
+            SKAction.moveBy(x: option == .left ? distance : -1 * distance, y: 0, duration: duration)
         ])
         spriteNode.run(SKAction.repeatForever(bounce))
     }
@@ -117,9 +117,9 @@ public class CoverInstruction: Instruction {
     // MARK: - Configuration
     override func buildView() {
         
-        guard let bacteria = childNode(withName: "bacteria") as? SKSpriteNode else { return }
+        guard let background = childNode(withName: "background") as? SKSpriteNode else { return }
         
-        bounceVertically(bacteria, duration: 0.70) /// Makes the bounce smoothier
+        bounceHorizontally(background, distance: 1000, duration: 9)
     }
 }
 
