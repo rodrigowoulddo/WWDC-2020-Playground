@@ -68,7 +68,9 @@ public class Instruction: SKScene {
         
         let movementAction = SKAction.sequence([
             SKAction.moveBy(x: 0, y: 1000, duration: 15),
+            SKAction.fadeAlpha(to: 0, duration: 1),
             SKAction.moveBy(x: 0, y: -1000, duration: 0),
+            SKAction.fadeAlpha(to: 1, duration: 1)
         ])
         node.run(SKAction.repeatForever(movementAction))
     }
@@ -79,7 +81,10 @@ public class Instruction: SKScene {
         
         let movementAction = SKAction.sequence([
             SKAction.moveBy(x: 0, y: distance, duration: 5),
+            SKAction.fadeAlpha(to: 0, duration: 1),
             SKAction.moveBy(x: 0, y: distance * -1, duration: 0),
+            SKAction.fadeAlpha(to: 1, duration: 1)
+
         ])
         node.run(SKAction.repeatForever(movementAction))
     }
