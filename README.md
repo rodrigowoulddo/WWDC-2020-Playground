@@ -8,6 +8,8 @@ The Bacteria Adventure is a maze-based game whose primary purpose is to teach a 
 
 For building this Swift Playground game, I used the SpriteKit framework, which is really cool because I was able to get the concepts and create a cool game in less than a week. [Daniela Reis](https://www.behance.net/daniela-ar) helped me with elements and scenarios design in the game. The theme song is public domain.
 
-![Game cover](https://raw.githubusercontent.com/rodrigowoulddo/WWDC-2020-The-Bacteria-Adventure/development/Screenshot.png?token=AES5KL3ZKQCCL26IEGY5YYS6Z2O4A)
+<img src="Screenshots/Screenshot 1.png" width="300" style="padding: 20px"> <img src="Screenshots/Screenshot 2.png" width="300" style="padding: 20px"> <img src="Screenshots/Screenshot 6.png" width="300" style="padding: 20px">
+
+<img src="Screenshots/Screenshot 4.png" width="300" style="padding: 20px"> <img src="Screenshots/Screenshot 5.png" width="300" style="padding: 20px"> <img src="Screenshots/Screenshot 3.png" width="300" style="padding: 20px">
 
 Demo video [here](https://youtu.be/odCptJ5_-_E)
